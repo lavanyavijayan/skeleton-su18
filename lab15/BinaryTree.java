@@ -16,21 +16,36 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        if (root == null) {
+            return 0;
+        }
+        return root.getHeight();
     }
 
     /* Returns true if the tree's left and right children are the same height
        and are themselves completely balanced. */
     public boolean isCompletelyBalanced() {
         // TODO: YOUR CODE HERE
-        return false;
+        if (root == null) {
+            return true;
+        }
+        return root.isBalanced();
     }
 
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
         BinaryTree<Integer> result = new BinaryTree<Integer>();
-        return null;
+        result.root = fibTreeHelper(N);
+        return result;
+    }
+
+    public static TreeNode<Integer> fibTreeHelper(int N) {
+        if (N < 2) {    //if N is 0 or 1
+            return new TreeNode<Integer>(N);
+        }
+        TreeNode<Integer> left = fibTreeHelper(N - 1);
+        TreeNode<Integer> right = fibTreeHelper(N - 2);
+        return new TreeNode<Integer>(left.item + right.item, left, right);
     }
 
     /* Print the values in the tree in preorder: root value first, then values
@@ -97,10 +112,13 @@ public class BinaryTree<T> {
         BinaryTree t;
         t = new BinaryTree();
         print(t, "the empty tree");
+        System.out.println("Height: "+ t.height() + ". Balanced: " + t.isCompletelyBalanced());
         t.sampleTree1();
         print(t, "sample tree 1");
+        System.out.println("Height: "+ t.height() + ". Balanced: " + t.isCompletelyBalanced());
         t.sampleTree2();
         print(t, "sample tree 2");
+        System.out.println("Height: "+ t.height() + ". Balanced: " + t.isCompletelyBalanced());
     }
 
     /* Note: this class is public in this lab for testing purposes. However,
@@ -169,5 +187,26 @@ public class BinaryTree<T> {
         }
 
         // TODO: ADD HELPER METHODS HERE
+        private int getHeight() {
+            if (left == null && right == null) {
+                return 1;
+            } else if (left == null) {
+                return right.getHeight() + 1;
+            } else if (right == null) {
+                return left.getHeight() + 1;
+            } else {
+                return Math.max(left.getHeight(), right.getHeight()) + 1;
+            }
+        }
+
+        private boolean isBalanced() {
+            if (left == null && right == null) {
+                return true;
+            } else if (left != null && right != null) {
+                return ((left.isBalanced() && right.isBalanced()) && (left.getHeight() == right.getHeight()));
+            } else {
+                return false;
+            }
+        }
     }
 }
