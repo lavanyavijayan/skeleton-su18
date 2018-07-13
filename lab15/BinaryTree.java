@@ -201,7 +201,9 @@ public class BinaryTree<T> {
             if (left == null && right == null) {
                 return true;
             } else if (left != null && right != null) {
-                return (left.isBalanced() && right.isBalanced()) && (left.getHeight() == right.getHeight());
+                boolean checkBalanced = left.isBalanced() && right.isBalanced();
+                boolean checkHeights = left.getHeight() == right.getHeight();
+                return checkBalanced && checkHeights;
             } else {
                 return false;
             }
