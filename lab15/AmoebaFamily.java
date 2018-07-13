@@ -77,7 +77,8 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
         theVijayans.addChild("Vijayan", "Lavanya");
         theVijayans.addChild("Vijayan", "Sharanya");
         theVijayans.addChild("Lavanya", "Ranganathan");
-        System.out.println("The longest name in the Vijayan family is " + theVijayans.longestName() +".");
+        System.out.print("The longest name in the Vijayan family is ");
+        System.out.println(theVijayans.longestName() + ".");
         System.out.println("Here's the Vijayan family");
         theVijayans.print();
         Iterator<Amoeba> iteratorA = theVijayans.iterator();
