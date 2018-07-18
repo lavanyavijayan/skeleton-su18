@@ -27,10 +27,18 @@ public class AList<Item> {
         return size;
     }
 
-    /** Returns if the collection contains k. */
+    /** Returns if the collection contains x. */
     public boolean contains(Item x) {
-        // TODO
-        return false;
+        if (items == null) {
+            return false;
+        } else {
+            for (int i = 0; i < size; i++) {
+                if (items[i].equals(x)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /** Adds x to the end of the list. */
@@ -52,11 +60,14 @@ public class AList<Item> {
         }
 
         // FIXME
-        for (int i = index + 1; i <= size; i += 1) {
-            items[i] = items[i - 1];
+        for (int i = size; i >= index; i --) {
+            if (i == index) {
+                items[i] = x;
+                size += 1;
+            } else {
+                items[i] = items[i - 1];
+            }
         }
-        items[index] = x;
-        size += 1;
     }
 
     /** Returns the last item in the list. */
@@ -80,5 +91,23 @@ public class AList<Item> {
     /** Removes the first instance of the item from this list. */
     public void remove(Item x) {
         // TODO
+        if (!contains(x)) {
+            return;
+        } else {
+            int index;
+            for (index = 0; index < size; index++) {
+                if (items[index].equals(x)) {
+                    break;
+                }
+            }
+            for (int i = index; i < size; i++) {
+                if (i == size - 1) {
+                    items[i] = null;
+                } else {
+                    items[i] = items[i + 1];
+                }
+            }
+            size -= 1;
+        }
     }
 }
