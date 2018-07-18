@@ -59,7 +59,6 @@ public class AList<Item> {
             resize(size * 2);
         }
 
-        // FIXME
         for (int i = size; i >= index; i --) {
             if (i == index) {
                 items[i] = x;
@@ -90,7 +89,6 @@ public class AList<Item> {
 
     /** Removes the first instance of the item from this list. */
     public void remove(Item x) {
-        // TODO
         if (!contains(x)) {
             return;
         } else {
