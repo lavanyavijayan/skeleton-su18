@@ -18,7 +18,7 @@ public class UnionFind {
       validate(v);
       int idOfV = id[v];
       if (idOfV < 0) {
-        return -1 * idOfV
+        return -1 * idOfV;
       } else {
         return -1 * id[idOfV];
       }
@@ -69,9 +69,9 @@ public class UnionFind {
         id[root1] = root2;
       } else if (sizeOf(root2) < sizeOf(root1)) {
         id[root1] += sizeOf(root2);
-        if[root2] = root1;
+        id[root2] = root1;
       } else {  // sizes of the sets are equal --> break tie
-        id[root2] += id[root1]
+        id[root2] += id[root1];
         id[root1] = root2;
       }
     }
