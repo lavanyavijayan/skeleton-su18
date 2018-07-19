@@ -15,7 +15,6 @@ public class UnionFind {
 
     /* Returns the size of the set V belongs to. */
     public int sizeOf(int v) {
-      validate(v);
       int idOfV = id[v];
       if (idOfV < 0) {
         return -1 * idOfV;
@@ -27,14 +26,11 @@ public class UnionFind {
     /* Returns the parent of V. If V is the root of a tree, returns the
        negative size of the tree for which V is the root. */
     public int parent(int v) {
-      validate(v);
       return id[v];
     }
 
     /* Returns true if nodes V1 and V2 are connected. */
     public boolean connected(int v1, int v2) {
-      validate(v1);
-      validate(v2);
       return find(v1) == find(v2);
     }
 
@@ -44,9 +40,9 @@ public class UnionFind {
     public int find(int v) {
       validate(v);
       int curr = v;
-      while (id[curr] >= 0) {
-        id[curr] = id[id[curr]];
-        curr = id[curr];
+      while (parent(curr) >= 0) {
+        id[curr] = parent(parent(curr));
+        curr = parent(curr);
       }
       return curr;
     }
@@ -57,8 +53,6 @@ public class UnionFind {
        with itself or vertices that are already connected should not change the
        structure. */
     public void union(int v1, int v2) {
-      validate(v1);
-      validate(v2);
       if (v1 == v2 || connected(v1, v2)) {
         return;
       }
@@ -77,7 +71,6 @@ public class UnionFind {
     }
 
     private void validate(int v) {
-      validate(v);
       int len = id.length;
       if (v < 0 || v >= len) {
         throw new IllegalArgumentException("index" + v + " is invalid. index must be between 0 and " + (len - 1));
