@@ -14,7 +14,8 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         this.loadFactor = 0.75;
     }
 
-    /* Constructs a new HashMap with the specified INITIALCAPACITY and default load factor of 0.75. */
+    /* Constructs a new HashMap with the specified INITIALCAPACITY
+    and default load factor of 0.75. */
     public HashMap(int initialCapacity) {
         entries = (LinkedList<Entry<K, V>> []) new LinkedList[initialCapacity];
         this.loadFactor = 0.75;
@@ -34,17 +35,20 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     /* Returns a specific integer when given a key. */
     private int hash(K key) {
-        return Math.floorMod(key.hashCode(), 10);
+        return Math.floorMod(key.hashCode(), entries.length);
     }
 
     /* Resizes the HashMap, by doubling its capacity. */
+    @SuppressWarnings("unchecked")
     private void resize() {
         int currentCapacity = capacity();
-        @SuppressWarnings("unchecked")
-        LinkedList<Entry<K, V>>[] resizedArray = (LinkedList<Entry<K, V>> []) new LinkedList[currentCapacity * 2];
+        LinkedList<Entry<K, V>>[] resizedArray;
+        resizedArray = (LinkedList<Entry<K, V>> []) new LinkedList[currentCapacity * 2];
         for (int i = 0; i < currentCapacity; i++) {
             resizedArray[i] = entries[i];
         }
+        entries = (LinkedList<Entry<K, V>> []) new LinkedList[currentCapacity * 2];
+        entries = resizedArray;
     }
 
     /* Returns the size of the HashMap. */
@@ -56,6 +60,9 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     public boolean containsKey(K key) {
         int keyHash = hash(key);
         LinkedList<Entry<K, V>> entryList = entries[keyHash];
+        if (entryList == null) {
+            return false;
+        }
         for (Entry<K, V> e : entryList) {
             if (e.key.equals(key)) {
                 return true;
@@ -95,6 +102,9 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         } else {
             if ((size() / entries.length) > loadFactor) {
                 resize();
+            }
+            if (entries[hash(key)] == null) {
+                entries[hash(key)] = new LinkedList<>();
             }
             entries[hash(key)].add(new Entry(key, value));
             size += 1;
