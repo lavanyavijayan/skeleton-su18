@@ -27,13 +27,15 @@ public class SimpleNameMap {
     }
 
     /* Resizes the SimpleNameMap, by doubling its capacity. */
+    @SuppressWarnings("unchecked")
     private void resize() {
         int currentCapacity = entries.length;
-        @SuppressWarnings("unchecked")
-        LinkedList<Entry>[] resizedArray = (LinkedList<Entry> []) new LinkedList[currentCapacity * 2];
+        LinkedList<Entry>[] resizedArray;
+        resizedArray = (LinkedList<Entry> []) new LinkedList[currentCapacity * 2];
         for (int i = 0; i < currentCapacity; i++) {
             resizedArray[i] = entries[i];
         }
+        entries = resizedArray;
     }
 
     /* Returns the size of the SimpleNameMap. */
@@ -45,6 +47,9 @@ public class SimpleNameMap {
     boolean containsKey(String key) {
         int keyHash = hash(key);
         LinkedList<Entry> entryList = entries[keyHash];
+        if (entryList == null) {
+            return false;
+        }
         for (Entry e : entryList) {
             if (e.key.equals(key)) {
                 return true;
@@ -89,6 +94,9 @@ public class SimpleNameMap {
             if (isValidName(key)) {
                 if ((size() / entries.length) > loadFactor) {
                     resize();
+                }
+                if (entries[hash(key)] == null) {
+                    entries[hash(key)] = new LinkedList<>();
                 }
                 entries[hash(key)].add(new Entry(key, value));
                 size += 1;
