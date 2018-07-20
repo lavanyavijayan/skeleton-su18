@@ -3,14 +3,16 @@ import java.util.LinkedList;
 public class SimpleNameMap {
 
     /* Instance variables */
-    private int size;
     private LinkedList<Entry>[] entries;
+    private int numOfEntries;
+    private int capacity;
     private int loadFactor;
 
     /* Constructs an empty SimpleNameMap with the specified initial capacity and load factor. */
     @SuppressWarnings("unchecked")
     public SimpleNameMap(int initialCapacity, int loadFactor) {
         entries = (LinkedList<Entry> []) new LinkedList[initialCapacity];
+        capacity = initialCapacity;
         this.loadFactor = loadFactor;
     }
 
@@ -29,10 +31,10 @@ public class SimpleNameMap {
     /* Resizes the SimpleNameMap, by doubling its capacity. */
     @SuppressWarnings("unchecked")
     private void resize() {
-        int currentCapacity = entries.length;
+        int currentLength = entries.length;
         LinkedList<Entry>[] resizedArray;
-        resizedArray = (LinkedList<Entry> []) new LinkedList[currentCapacity * 2];
-        for (int i = 0; i < currentCapacity; i++) {
+        resizedArray = (LinkedList<Entry> []) new LinkedList[currentLength * 2];
+        for (int i = 0; i < currentLength; i++) {
             resizedArray[i] = entries[i];
         }
         entries = resizedArray;
@@ -40,7 +42,7 @@ public class SimpleNameMap {
 
     /* Returns the size of the SimpleNameMap. */
     int size() {
-        return size;
+        return numOfEntries;
     }
 
     /* Returns true if the map contains the KEY. */
@@ -80,26 +82,29 @@ public class SimpleNameMap {
        SimpleNameMap, replace the current corresponding value with VALUE. */
     void put(String key, String value) {
         if (containsKey(key)) {
-            if ((size() / entries.length) > loadFactor) {
+            if (((double) size() / (double) entries.length) > loadFactor) {
                 resize();
             }
             LinkedList<Entry> entryList = entries[hash(key)];
             for (Entry e : entryList) {
                 if (e.key.equals(key)) {
                     e.value = value;
-                    break;
+                    return;
                 }
             }
         } else {
             if (isValidName(key)) {
-                if ((size() / entries.length) > loadFactor) {
+                if (((double) size() / (double) entries.length) > loadFactor) {
                     resize();
                 }
-                if (entries[hash(key)] == null) {
-                    entries[hash(key)] = new LinkedList<>();
+                LinkedList<Entry> entryList = entries[hash(key)];
+                if (entryList == null) {
+                    entryList = new LinkedList<>();
                 }
-                entries[hash(key)].add(new Entry(key, value));
-                size += 1;
+                entryList.add(new Entry(key, value));
+                entries[hash(key)] = entryList;
+                numOfEntries += 1;
+                capacity += 1;
             }
         }
     }
@@ -116,7 +121,8 @@ public class SimpleNameMap {
                     break;
                 }
             }
-            size -= 1;
+            numOfEntries -= 1;
+            capacity -= 1;
             return val;
         } else {
             return null;
