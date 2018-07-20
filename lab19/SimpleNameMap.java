@@ -1,16 +1,17 @@
 import java.util.LinkedList;
-import java.lang.reflect.Array;
 
 public class SimpleNameMap {
 
-    /* Instance variables here*/
+    /* Instance variables */
     private int size;
     private LinkedList<Entry>[] entries;
+    private int loadFactor;
 
-    /* Constructs an empty SimpleNameMap with initial capacity of 26. */
+    /* Constructs an empty SimpleNameMap with the specified initial capacity and load factor. */
     @SuppressWarnings("unchecked")
-    public SimpleNameMap() {
-        entries = (LinkedList<Entry> []) new LinkedList[26];
+    public SimpleNameMap(int initialCapacity, int loadFactor) {
+        entries = (LinkedList<Entry> []) new LinkedList[initialCapacity];
+        this.loadFactor = loadFactor;
     }
 
     /* Returns true if the given KEY is a valid name that starts with A - Z. */
@@ -20,7 +21,24 @@ public class SimpleNameMap {
 
     /* Returns a specific integer when given a key. */
     private int hash(String key) {
-        return (int) (key.charAt(0) - 'A');
+        //return (int) (key.charAt(0) - 'A');
+        //return (key.charAt(0) - 'A') % 10;
+        return Math.floorMod(key.hashCode(), 10);
+    }
+
+    /* Resizes the SimpleNameMap, by doubling its capacity. */
+    private void resize() {
+        int currentCapacity = entries.length;
+        @SuppressWarnings("unchecked")
+        LinkedList<Entry>[] resizedArray = (LinkedList<Entry> []) new LinkedList[currentCapacity * 2];
+        for (int i = 0; i < currentCapacity; i++) {
+            resizedArray[i] = entries[i];
+        }
+    }
+
+    /* Returns the size of the SimpleNameMap. */
+    int size() {
+        return size;
     }
 
     /* Returns true if the map contains the KEY. */
@@ -57,6 +75,9 @@ public class SimpleNameMap {
        SimpleNameMap, replace the current corresponding value with VALUE. */
     void put(String key, String value) {
         if (containsKey(key)) {
+            if ((size() / entries.length) > loadFactor) {
+                resize();
+            }
             LinkedList<Entry> entryList = entries[hash(key)];
             for (Entry e : entryList) {
                 if (e.key.equals(key)) {
@@ -66,6 +87,9 @@ public class SimpleNameMap {
             }
         } else {
             if (isValidName(key)) {
+                if ((size() / entries.length) > loadFactor) {
+                    resize();
+                }
                 entries[hash(key)].add(new Entry(key, value));
                 size += 1;
             }
@@ -80,10 +104,11 @@ public class SimpleNameMap {
             LinkedList<Entry> entryList = entries[hash(key)];
             for (Entry e : entryList) {
                 if (e.key.equals(key)) {
-                    e = null;
+                    entryList.remove(e);
                     break;
                 }
             }
+            size -= 1;
             return val;
         } else {
             return null;
