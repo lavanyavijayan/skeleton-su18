@@ -65,10 +65,10 @@ public class HashMapTest {
     @Test
     public void testResize() {
         HashMap<String, String> h = new HashMap<String, String>(2);
-        assertEquals(h.capacity(), 2);
+        assertEquals(2, h.capacity());
         h.put("angela", "neil");
         h.put("christine", "kevin");
-        assertEquals(h.capacity(), 4);
+        assertEquals(4, h.capacity());
 
         h = new HashMap<String, String>(10, 1);
         for (int i = 1; i <= 10; i += 1) {
@@ -82,6 +82,23 @@ public class HashMapTest {
         h.remove("11");
         assertEquals(10, h.size());
         assertEquals(20, h.capacity());
+    }
+
+    @Test
+    public void simplyTestResize() {
+        HashMap<Integer, Integer> a = new HashMap<>(3);
+        a.put(1, 1);
+        assertEquals(1, a.size());
+        assertEquals(3, a.capacity());
+        a.put(2, 2);
+        assertEquals(2, a.size());
+        assertEquals(3, a.capacity());
+        a.put(3, 3);
+        assertEquals(3, a.size());
+        assertEquals(6, a.capacity());
+        a.put(4, 4);
+        assertEquals(4, a.size());
+        assertEquals(6, a.capacity());
     }
 
     @Test
