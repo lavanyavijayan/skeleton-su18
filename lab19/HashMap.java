@@ -6,13 +6,13 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     /* Instance variables */
     private LinkedList<Entry<K, V>>[] entries;
     private int numOfEntries;
-    private int capacity;
+    //private int capacity;
     private double loadFactor;
 
     /* Constructs a new HashMap with a default capacity of 16 and load factor of 0.75. */
     public HashMap() {
         entries = (LinkedList<Entry<K, V>> []) new LinkedList[16];
-        capacity = 16;
+        //capacity = 16;
         this.loadFactor = 0.75;
     }
 
@@ -20,7 +20,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     and default load factor of 0.75. */
     public HashMap(int initialCapacity) {
         entries = (LinkedList<Entry<K, V>> []) new LinkedList[initialCapacity];
-        capacity = initialCapacity;
+        //capacity = initialCapacity;
         this.loadFactor = 0.75;
     }
 
@@ -28,7 +28,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     @SuppressWarnings("unchecked")
     public HashMap(int initialCapacity, double loadFactor) {
         entries = (LinkedList<Entry<K, V>> []) new LinkedList[initialCapacity];
-        capacity = initialCapacity;
+        //capacity = initialCapacity;
         this.loadFactor = loadFactor;
     }
 
@@ -42,15 +42,30 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         return Math.floorMod(key.hashCode(), entries.length);
     }
 
+    /* Returns a specific integer when given a key and an array. */
+    private int hash (K key, int arrayLength) {
+        return Math.floorMod(key.hashCode(), arrayLength);
+    }
+
     /* Resizes the HashMap, by doubling its capacity. */
     @SuppressWarnings("unchecked")
     private void resize() {
         int currentLength = entries.length;
-        capacity += currentLength;
+        //capacity += currentLength;
         LinkedList<Entry<K, V>>[] resizedArray;
         resizedArray = (LinkedList<Entry<K, V>> []) new LinkedList[currentLength * 2];
-        for (int i = 0; i < currentLength; i++) {
-            resizedArray[i] = entries[i];
+        for (LinkedList<Entry<K, V>> oldList : entries) {
+            if (oldList != null) {
+                for (Entry<K, V> e : oldList) {
+                    int resizedIndex = hash(e.key, currentLength * 2);
+                    LinkedList<Entry<K, V>> newList = resizedArray[resizedIndex];
+                    if (newList == null) {
+                        newList = new LinkedList<>();
+                    }
+                    newList.add(new Entry(e.key, e.value));
+                    resizedArray[resizedIndex] = newList;
+                }
+            }
         }
         entries = (LinkedList<Entry<K, V>> []) new LinkedList[currentLength * 2];
         entries = resizedArray;
@@ -93,9 +108,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
        HashMap, replace the current corresponding value with VALUE. */
     public void put(K key, V value) {
-        if (((double) size() / (double) entries.length) > loadFactor) {
-            resize();
-        }
         if (containsKey(key)) {
             LinkedList<Entry<K, V>> entryList = entries[hash(key)];
             for (Entry<K, V> e : entryList) {
@@ -105,14 +117,18 @@ public class HashMap<K, V> implements Map61BL<K, V> {
                 }
             }
         } else {
-            LinkedList<Entry<K, V>> entryList = entries[hash(key)];
+            if (((double) (size() + 1) / (double) entries.length) > loadFactor) {
+                resize();
+            }
+            int position = hash(key);
+            LinkedList<Entry<K, V>> entryList = entries[position];
             if (entryList == null) {
                 entryList = new LinkedList<>();
             }
             entryList.add(new Entry(key, value));
-            entries[hash(key)] = entryList;
+            entries[position] = entryList;
             numOfEntries += 1;
-            capacity += 1;
+            //capacity += 1;
         }
     }
 
@@ -129,7 +145,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
                 }
             }
             numOfEntries -= 1;
-            capacity -= 1;
+            //capacity -= 1;
             return val;
         } else {
             return null;
@@ -149,7 +165,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
                     if (e.value.equals(value)) {
                         entryList.remove(e);
                         numOfEntries -= 1;
-                        capacity -= 1;
+                        //capacity -= 1;
                         return true;
                     } else {
                         return false;
@@ -166,7 +182,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     /* Returns the length of the HashMap's internal array. */
     public int capacity() {
-        return capacity;
+        return entries.length;
     }
 
     private static class Entry<K, V> {
