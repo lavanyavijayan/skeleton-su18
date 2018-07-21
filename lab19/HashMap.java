@@ -43,7 +43,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     }
 
     /* Returns a specific integer when given a key and an array. */
-    private int hash (K key, int arrayLength) {
+    private int hash(K key, int arrayLength) {
         return Math.floorMod(key.hashCode(), arrayLength);
     }
 
