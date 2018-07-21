@@ -29,7 +29,7 @@ public class SimpleNameMap {
     }
 
     /* Returns a specific integer when given a key and an array. */
-    private int hash (String key, int arrayLength) {
+    private int hash(String key, int arrayLength) {
         return Math.floorMod(key.hashCode(), arrayLength);
     }
 
