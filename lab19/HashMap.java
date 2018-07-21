@@ -2,6 +2,8 @@ import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.ListIterator;
+import java.util.List;
+import java.util.ArrayList;
 
 public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
 
@@ -12,24 +14,26 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
     private double loadFactor;
 
     /* Constructs a new HashMap with a default capacity of 16 and load factor of 0.75. */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public HashMap() {
-        entries = (LinkedList<Entry<K, V>> []) new LinkedList[16];
+        entries = new LinkedList[16];
         //capacity = 16;
         this.loadFactor = 0.75;
     }
 
     /* Constructs a new HashMap with the specified INITIALCAPACITY
     and default load factor of 0.75. */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public HashMap(int initialCapacity) {
-        entries = (LinkedList<Entry<K, V>> []) new LinkedList[initialCapacity];
+        entries = new LinkedList[initialCapacity];
         //capacity = initialCapacity;
         this.loadFactor = 0.75;
     }
 
     /* Constructs a new HashMap with the specified INITIALCAPACITY and LOADFACTOR. */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public HashMap(int initialCapacity, double loadFactor) {
-        entries = (LinkedList<Entry<K, V>> []) new LinkedList[initialCapacity];
+        entries = new LinkedList[initialCapacity];
         //capacity = initialCapacity;
         this.loadFactor = loadFactor;
     }
@@ -50,12 +54,11 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
     }
 
     /* Resizes the HashMap, by doubling its capacity. */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void resize() {
         int currentLength = entries.length;
         //capacity += currentLength;
-        LinkedList<Entry<K, V>>[] resizedArray;
-        resizedArray = (LinkedList<Entry<K, V>> []) new LinkedList[currentLength * 2];
+        LinkedList<Entry<K, V>>[] resizedArray = new LinkedList[currentLength * 2];
         for (LinkedList<Entry<K, V>> oldList : entries) {
             if (oldList != null) {
                 for (Entry<K, V> e : oldList) {
@@ -69,7 +72,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
                 }
             }
         }
-        entries = (LinkedList<Entry<K, V>> []) new LinkedList[currentLength * 2];
         entries = resizedArray;
     }
 
@@ -127,7 +129,7 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
             if (entryList == null) {
                 entryList = new LinkedList<>();
             }
-            entryList.add(new Entry(key, value));
+            entryList.add(new Entry<>(key, value));
             entries[position] = entryList;
             numOfEntries += 1;
             //capacity += 1;
@@ -154,8 +156,10 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
         }
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void clear() {
-        entries = (LinkedList<Entry<K, V>> []) new LinkedList[capacity()];
+        int currentCapacity = entries.length;
+        entries = new LinkedList[currentCapacity];
         numOfEntries = 0;
     }
 
@@ -189,51 +193,39 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
 
     public class HashMapIterator implements Iterator<K> {
 
-        private ListIterator<Entry<K, V>> entryListIterator;
-        private int entriesIndex;
+        private final List<ListIterator<Entry<K, V>>> iterators;
+        private int index;
 
         public HashMapIterator() {
+            iterators = new ArrayList<>();
             if (entries != null) {
-                entryListIterator = entries[0].listIterator();
-                entriesIndex = 0;
+                for (int i = 0; i < entries.length; i++) {
+                    if (entries[i] != null) {
+                        iterators.add(entries[i].listIterator());
+                    }
+                }
             }
         }
 
         public boolean hasNext() {
-            if (entries == null || entryListIterator == null) {
+            if (iterators.size() == 0 || index >= iterators.size()) {
                 return false;
-            }
-            if (entryListIterator.hasNext()) {
-                return true;
-            }
-            if (entriesIndex >= 0 && entriesIndex < entries.length) {
-                return true;
-            } else {
-                return false;
+            } else { // iterators.size() > 0 && index || iterators.size()
+                return iterators.get(index).hasNext();
             }
         }
 
         public K next() {
             if (!hasNext()) {
                 throw new NoSuchElementException("HashMap ran out of keys.");
-            } else if (entryListIterator.hasNext()) {
-                entriesIndex += 1;
-                K keyToReturn = entryListIterator.next().key;
-                if (!entryListIterator.hasNext()) {
-                    LinkedList<Entry<K, V>> entryList = entries[entriesIndex];
-                    while (entryList == null && entriesIndex < entries.length) {
-                        entriesIndex += 1;
-                        entryList = entries[entriesIndex];
-                    }
-                    if (entryList == null) {
-                        entryListIterator = null;
-                    } else {
-                        entryListIterator = entries[entriesIndex].listIterator();
+            } else {
+                K keyToReturn = iterators.get(index).next().key;
+                if (index < iterators.size()) {
+                    if (!iterators.get(index).hasNext()) {
+                        index += 1;
                     }
                 }
                 return keyToReturn;
-            } else {
-                return null;
             }
         }
     }
@@ -249,16 +241,17 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
         }
 
         /* Returns true if this key matches with the OTHER's key. */
-        public boolean keyEquals(Entry other) {
+        public boolean keyEquals(Entry<K, V> other) {
             return key.equals(other.key);
         }
 
         /* Returns true if both the KEY and the VALUE match. */
         @Override
+        @SuppressWarnings("unchecked")
         public boolean equals(Object other) {
             return (other instanceof Entry
-                    && key.equals(((Entry) other).key)
-                    && value.equals(((Entry) other).value));
+                    && key.equals(((Entry<K, V>) other).key)
+                    && value.equals(((Entry<K, V>) other).value));
         }
 
         @Override
