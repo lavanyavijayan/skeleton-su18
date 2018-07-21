@@ -1,7 +1,9 @@
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.ListIterator;
 
-public class HashMap<K, V> implements Map61BL<K, V> {
+public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
 
     /* Instance variables */
     private LinkedList<Entry<K, V>>[] entries;
@@ -177,12 +179,63 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     }
 
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException("unsupported operation");
+        return new HashMapIterator();
     }
 
     /* Returns the length of the HashMap's internal array. */
     public int capacity() {
         return entries.length;
+    }
+
+    public class HashMapIterator implements Iterator<K> {
+
+        private ListIterator<Entry<K, V>> entryListIterator;
+        private int entriesIndex;
+
+        public HashMapIterator() {
+            if (entries != null) {
+                entryListIterator = entries[0].listIterator();
+                entriesIndex = 0;
+            }
+        }
+
+        public boolean hasNext() {
+            if (entries == null || entryListIterator == null) {
+                return false;
+            }
+            if (entryListIterator.hasNext()) {
+                return true;
+            }
+            if (entriesIndex >= 0 && entriesIndex < entries.length) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public K next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException("HashMap ran out of keys.");
+            } else if (entryListIterator.hasNext()) {
+                entriesIndex += 1;
+                K keyToReturn = entryListIterator.next().key;
+                if (!entryListIterator.hasNext()) {
+                    LinkedList<Entry<K, V>> entryList = entries[entriesIndex];
+                    while (entryList == null && entriesIndex < entries.length) {
+                        entriesIndex += 1;
+                        entryList = entries[entriesIndex];
+                    }
+                    if (entryList == null) {
+                        entryListIterator = null;
+                    } else {
+                        entryListIterator = entries[entriesIndex].listIterator();
+                    }
+                }
+                return keyToReturn;
+            } else {
+                return null;
+            }
+        }
     }
 
     private static class Entry<K, V> {
