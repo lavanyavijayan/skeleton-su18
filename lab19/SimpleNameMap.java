@@ -5,14 +5,14 @@ public class SimpleNameMap {
     /* Instance variables */
     private LinkedList<Entry>[] entries;
     private int numOfEntries;
-    private int capacity;
+    //private int capacity;
     private int loadFactor;
 
     /* Constructs an empty SimpleNameMap with the specified initial capacity and load factor. */
     @SuppressWarnings("unchecked")
     public SimpleNameMap(int initialCapacity, int loadFactor) {
         entries = (LinkedList<Entry> []) new LinkedList[initialCapacity];
-        capacity = initialCapacity;
+        //capacity = initialCapacity;
         this.loadFactor = loadFactor;
     }
 
@@ -28,15 +28,31 @@ public class SimpleNameMap {
         return Math.floorMod(key.hashCode(), 10);
     }
 
+    /* Returns a specific integer when given a key and an array. */
+    private int hash (String key, int arrayLength) {
+        return Math.floorMod(key.hashCode(), arrayLength);
+    }
+
     /* Resizes the SimpleNameMap, by doubling its capacity. */
     @SuppressWarnings("unchecked")
     private void resize() {
         int currentLength = entries.length;
         LinkedList<Entry>[] resizedArray;
         resizedArray = (LinkedList<Entry> []) new LinkedList[currentLength * 2];
-        for (int i = 0; i < currentLength; i++) {
-            resizedArray[i] = entries[i];
+        for (LinkedList<Entry> oldList : entries) {
+            if (oldList != null) {
+                for (Entry e : oldList) {
+                    int resizedIndex = hash(e.key, currentLength * 2);
+                    LinkedList<Entry> newList = resizedArray[resizedIndex];
+                    if (newList == null) {
+                        newList = new LinkedList<>();
+                    }
+                    newList.add(new Entry(e.key, e.value));
+                    resizedArray[resizedIndex] = newList;
+                }
+            }
         }
+        entries = (LinkedList<Entry> []) new LinkedList[currentLength * 2];
         entries = resizedArray;
     }
 
@@ -82,9 +98,6 @@ public class SimpleNameMap {
        SimpleNameMap, replace the current corresponding value with VALUE. */
     void put(String key, String value) {
         if (containsKey(key)) {
-            if (((double) size() / (double) entries.length) > loadFactor) {
-                resize();
-            }
             LinkedList<Entry> entryList = entries[hash(key)];
             for (Entry e : entryList) {
                 if (e.key.equals(key)) {
@@ -94,7 +107,7 @@ public class SimpleNameMap {
             }
         } else {
             if (isValidName(key)) {
-                if (((double) size() / (double) entries.length) > loadFactor) {
+                if (((double) (size() + 1) / (double) entries.length) > loadFactor) {
                     resize();
                 }
                 LinkedList<Entry> entryList = entries[hash(key)];
@@ -104,7 +117,7 @@ public class SimpleNameMap {
                 entryList.add(new Entry(key, value));
                 entries[hash(key)] = entryList;
                 numOfEntries += 1;
-                capacity += 1;
+                //capacity += 1;
             }
         }
     }
@@ -122,7 +135,7 @@ public class SimpleNameMap {
                 }
             }
             numOfEntries -= 1;
-            capacity -= 1;
+            //capacity -= 1;
             return val;
         } else {
             return null;
