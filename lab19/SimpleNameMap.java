@@ -37,8 +37,7 @@ public class SimpleNameMap {
     @SuppressWarnings("unchecked")
     private void resize() {
         int currentLength = entries.length;
-        LinkedList<Entry>[] resizedArray;
-        resizedArray = (LinkedList<Entry> []) new LinkedList[currentLength * 2];
+        LinkedList<Entry>[] resizedArray = (LinkedList<Entry> []) new LinkedList[currentLength * 2];
         for (LinkedList<Entry> oldList : entries) {
             if (oldList != null) {
                 for (Entry e : oldList) {
@@ -52,7 +51,6 @@ public class SimpleNameMap {
                 }
             }
         }
-        entries = (LinkedList<Entry> []) new LinkedList[currentLength * 2];
         entries = resizedArray;
     }
 
