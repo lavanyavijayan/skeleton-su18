@@ -10,14 +10,12 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
     /* Instance variables */
     private LinkedList<Entry<K, V>>[] entries;
     private int numOfEntries;
-    //private int capacity;
     private double loadFactor;
 
     /* Constructs a new HashMap with a default capacity of 16 and load factor of 0.75. */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public HashMap() {
         entries = new LinkedList[16];
-        //capacity = 16;
         this.loadFactor = 0.75;
     }
 
@@ -26,7 +24,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public HashMap(int initialCapacity) {
         entries = new LinkedList[initialCapacity];
-        //capacity = initialCapacity;
         this.loadFactor = 0.75;
     }
 
@@ -34,7 +31,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public HashMap(int initialCapacity, double loadFactor) {
         entries = new LinkedList[initialCapacity];
-        //capacity = initialCapacity;
         this.loadFactor = loadFactor;
     }
 
@@ -57,7 +53,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void resize() {
         int currentLength = entries.length;
-        //capacity += currentLength;
         LinkedList<Entry<K, V>>[] resizedArray = new LinkedList[currentLength * 2];
         for (LinkedList<Entry<K, V>> oldList : entries) {
             if (oldList != null) {
@@ -132,7 +127,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
             entryList.add(new Entry<>(key, value));
             entries[position] = entryList;
             numOfEntries += 1;
-            //capacity += 1;
         }
     }
 
@@ -149,7 +143,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
                 }
             }
             numOfEntries -= 1;
-            //capacity -= 1;
             return val;
         } else {
             return null;
@@ -171,7 +164,6 @@ public class HashMap<K, V> implements Map61BL<K, V>, Iterable<K> {
                     if (e.value.equals(value)) {
                         entryList.remove(e);
                         numOfEntries -= 1;
-                        //capacity -= 1;
                         return true;
                     } else {
                         return false;
